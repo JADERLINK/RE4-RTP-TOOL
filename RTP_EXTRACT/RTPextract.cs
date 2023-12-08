@@ -115,7 +115,7 @@ namespace RTP_EXTRACT
                     connectionTableIndex = BitConverter.ToUInt16(line2, 0x0);
                     connectionCount = BitConverter.ToUInt16(line2, 0x2);
 
-                    // pading
+                    // padding
                 }
                 else 
                 {

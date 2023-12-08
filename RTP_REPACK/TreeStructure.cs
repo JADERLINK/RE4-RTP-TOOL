@@ -11,12 +11,35 @@ namespace RTP_REPACK
         Dictionary<int, Point> PointList;
         Dictionary<ushort, List<Block2>> Block2List;
 
-        Dictionary<int, TreeNode> NodeList; //os filhos são a direção para onde ele podem ir.
+        Dictionary<int, TreeNode> NodeList; //os filhos são a direção para onde ele podem ir. // os pais são os nodes de onde eles vieram.
+
+        //lista invertida, do destino volta para a origem
+        Dictionary<ushort, List<Block2>> Block2InvList;
 
         public TreeStructure(ref Dictionary<int, Point> PointList, ref Dictionary<ushort, List<Block2>> Block2List)
         {
             this.PointList = PointList;
             this.Block2List = Block2List;
+
+            Block2InvList = new Dictionary<ushort, List<Block2>>();
+            foreach (var obj in Block2List)
+            {
+                foreach (var block2 in obj.Value)
+                {
+                    Block2 newBlock2 = new Block2();
+                    newBlock2.ConnectionIndex = obj.Key;
+                    newBlock2.Distance = block2.Distance;
+
+                    if (Block2InvList.ContainsKey(block2.ConnectionIndex))
+                    {
+                        Block2InvList[block2.ConnectionIndex].Add(newBlock2);
+                    }
+                    else 
+                    {
+                        Block2InvList.Add(block2.ConnectionIndex, new List<Block2>() { newBlock2 });
+                    }
+                }
+            }
         }
 
         public void MakeTree()
@@ -57,7 +80,11 @@ namespace RTP_REPACK
                         NodeList.Add(ConectionId, child);
                     }
 
+                    // adiciona o seu destino
                     root.Children.Add(child);
+
+                    // adiciona ao destino a origem
+                    child.Father.Add(root);
                 }
             }
 
@@ -94,21 +121,21 @@ namespace RTP_REPACK
                 block3List[i] = list;
             }
 
-            //lsta com os caminhos
-            //sendo (score, caminho) origem, destino  
+            //lista com os caminhos
+            //sendo (score, caminho) [origem, destino]  
             KeyValuePair<int, List<int>>[,] pathList = new KeyValuePair<int, List<int>>[PointList.Count, PointList.Count];
 
 
             for (int x = 0; x < PointList.Count; x++)
             {
                 // lista com os nodes que ja foram vistos.
-                HashSet<int> nodesVisited = new HashSet<int>();
-                nodesVisited.Add(x);
+                HashSet<int> allNodesVisited = new HashSet<int>();
                 TreeNode node = NodeList[x];
-                recursive(node, new List<int>() { x }, ref nodesVisited, ref pathList, node.ID, node.ID, 0);
 
-                int nivel = 0;
-                recursiveNivel(node, new List<int>() { x }, ref pathList, node.ID, node.ID, 0, ref nivel);
+                List<(TreeNode node, List<int> nodesVisited, int score)> nodeToBeVisited = new List<(TreeNode node, List<int> nodesVisited, int score)>();
+                nodeToBeVisited.Add((node, new List<int>(), 0));
+
+                recursiveV2(nodeToBeVisited, ref allNodesVisited, ref pathList, node.ID);
 
             }
 
@@ -123,6 +150,7 @@ namespace RTP_REPACK
                     if (pathList[row, column].Value != null)
                     {
                         List<int> path = pathList[row, column].Value;
+                        path.Reverse();
 
                         for (int i = 0; i < path.Count - 1; i++)
                         {
@@ -140,71 +168,66 @@ namespace RTP_REPACK
             return block3List;
         }
 
-
-        // verifica uma rota para cada dois pontos
-        private void recursive(TreeNode node, List<int> externalNodes, ref HashSet<int> nodesVisited, ref KeyValuePair<int, List<int>>[,] pathList, int lastId, int origin, int score)
+        //verifica uma rota para cada dois pontos, usando os pais(Father), versão2
+        private void recursiveV2(List<(TreeNode node, List<int> nodesVisited, int score)> nodesToBeVisited, ref HashSet<int> allNodesVisited, ref KeyValuePair<int, List<int>>[,] pathList, int destiny)
         {
-            foreach (var item in node)
+            //lista de nodes para serem visitados
+            //(node a ser visitado, lista de nodes visitados ate chegar nele, score)
+            List<(TreeNode node, List<int> nodesVisited, int score)> internalNodesToBeVisited = new List<(TreeNode node, List<int> nodesVisited, int score)>();
+
+            if (nodesToBeVisited.Count != 0)
             {
-                int id = item.ID;
-
-                if (!nodesVisited.Contains(id))
+                foreach (var item in nodesToBeVisited)
                 {
-                    List<int> internalNodes = new List<int>();
-                    internalNodes.AddRange(externalNodes);
-
-                    nodesVisited.Add(id);
-                    internalNodes.Add(id);
-
-                    score += (Block2List[(ushort)lastId].Where(o => o.ConnectionIndex == id).First().Distance);
-
-                    pathList[origin, id] = new KeyValuePair<int, List<int>>(score, internalNodes.ToList());
-                  
-                    recursive(item, internalNodes, ref nodesVisited, ref pathList, id, origin, score);
-                }
-
-            }
-
-        }
-
-
-
-        // procura rotas menores, dentro de um limite.
-        private void recursiveNivel(TreeNode node, List<int> externalNodes , ref KeyValuePair<int, List<int>>[,] pathList, int lastId, int origin, int score, ref int nivel) 
-        {
-            
-            nivel += 1;
-
-            for (int i = node.Count -1; i >= 0;i--)
-            {
-                var item = node[i];
-       
-                int id = item.ID;
-
-                //Console.WriteLine("id: " + id + "  origin: " + origin + "  lastId: " + lastId + " score: " + score + "  nivel: " + nivel);
-
-                if (!externalNodes.Contains(id) && nivel < 10000)
-                {
-                    List<int> internalNodes = new List<int>();
-                    internalNodes.AddRange(externalNodes);
-
-                    internalNodes.Add(id);
-
-                    score += (Block2List[(ushort)lastId].Where(o => o.ConnectionIndex == id).First().Distance);
-
-                    if (score < pathList[origin, id].Key)
+                    int id = item.node.ID;
+                    if (!allNodesVisited.Contains(id))
                     {
-                        pathList[origin, id] = new KeyValuePair<int, List<int>>(score, internalNodes.ToList());
+                        List<int> internalNodes = new List<int>();
+                        internalNodes.AddRange(item.nodesVisited);
+                        internalNodes.Add(id);
+
+                        int lastId = id;
+                        if (item.nodesVisited.Count != 0)
+                        {
+                            lastId = item.nodesVisited.Last();
+                        }
+
+                        int? Distance = null;
+
+                        if (Block2InvList.ContainsKey((ushort)lastId))
+                        {
+                            Distance = (Block2InvList[(ushort)lastId].Where(o => o.ConnectionIndex == id).FirstOrDefault()?.Distance);
+                        }
+
+                        int newscore = item.score + (Distance != null ? (int)Distance : 0);
+
+                        if (pathList[id, destiny].Key == 0 || newscore < pathList[id, destiny].Key)
+                        {
+                            pathList[id, destiny] = new KeyValuePair<int, List<int>>(newscore, internalNodes.ToList());
+                        }
+
+                        foreach (var subItem in item.node.Father)
+                        {
+                            if (!allNodesVisited.Contains(subItem.ID))
+                            {
+                                internalNodesToBeVisited.Add((subItem, internalNodes, newscore));
+                            }
+                        }
                     }
-            
-                    recursiveNivel(item, internalNodes, ref pathList, id, origin, score, ref nivel);
                 }
-                
+
+                foreach (var item in nodesToBeVisited)
+                {
+                    int id = item.node.ID;
+                    allNodesVisited.Add(id);
+                }
+
+                recursiveV2(internalNodesToBeVisited, ref allNodesVisited, ref pathList, destiny);
             }
 
         }
 
-
+     
     }
 
 

@@ -78,10 +78,10 @@ namespace RTP_REPACK
 
             for (int i = 0; i < Block1Array.Length; i++)
             {
-                byte[] x = BitConverter.GetBytes(Block1Array[i].X);
-                byte[] y = BitConverter.GetBytes(Block1Array[i].Y);
-                byte[] z = BitConverter.GetBytes(Block1Array[i].Z);
-                byte[] w = BitConverter.GetBytes(1.0f);
+                byte[] x = BitConverter.GetBytes((float)Block1Array[i].X);
+                byte[] y = BitConverter.GetBytes((float)Block1Array[i].Y);
+                byte[] z = BitConverter.GetBytes((float)Block1Array[i].Z);
+                byte[] w = BitConverter.GetBytes((float)1.0f);
 
                 byte[] index = BitConverter.GetBytes((ushort)Block1Array[i].ConnectionTableIndex);
                 byte[] count = BitConverter.GetBytes((ushort)Block1Array[i].ConnectionCount);

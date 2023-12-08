@@ -33,6 +33,8 @@ namespace RTP_REPACK
 
                 if (groupName.StartsWith("_RTP"))
                 {
+                    Console.WriteLine("Loading in Obj: " + groupName);
+
                     int id = -1;
 
                     var split1 = groupName.Split('#');
@@ -86,6 +88,8 @@ namespace RTP_REPACK
                 }
                 else if (groupName.StartsWith("CONNECTION"))
                 {
+                    Console.WriteLine("Loading in Obj: " + groupName);
+
                     var split1 = groupName.Split('#');
 
                     if (split1.Length >= 2)
@@ -173,7 +177,7 @@ namespace RTP_REPACK
             }
 
             // adiciona os Points faltantes
-            for (int i = 0; i < lastPoint; i++)
+            for (int i = 0; i <= lastPoint; i++)
             {
                 if (!PointList.ContainsKey(i))
                 {

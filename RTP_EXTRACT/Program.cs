@@ -9,7 +9,7 @@ namespace RTP_EXTRACT
 {
     class Program
     {
-        public static string Version = "A.1.0.0.0 (2023-10-12)";
+        public static string Version = "B.1.1.0.0 (2023-12-08)";
 
         public static string headerText()
         {
@@ -23,7 +23,13 @@ namespace RTP_EXTRACT
         {
             Console.WriteLine(headerText());
 
-            if (args.Length >= 1 && File.Exists(args[0]))
+
+            if (args.Length == 0)
+            {
+                Console.WriteLine("For more information read:");
+                Console.WriteLine("https://github.com/JADERLINK/RE4-RTP-TOOL");
+            }
+            else if (args.Length >= 1 && File.Exists(args[0]))
             {
                 bool isPS2 = false;
 
@@ -50,7 +56,7 @@ namespace RTP_EXTRACT
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine("Error: " + ex.Message);
+                        Console.WriteLine("Error: " + ex);
                     }
                 }
                 else
@@ -61,11 +67,11 @@ namespace RTP_EXTRACT
             }
             else
             {
-                Console.WriteLine("No file");
+                Console.WriteLine("The file does not exist");
             }
 
 
-            Console.WriteLine("end");
+            Console.WriteLine("End");
         }
 
 

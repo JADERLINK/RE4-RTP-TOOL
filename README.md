@@ -6,7 +6,12 @@ Translate from Portuguese Brazil
 
 Programas destinados a extrair e reempacotar arquivo .RTP do RE4 de PS2, 2007, UHD.
 <br>Nota: esse é o arquivo que define quais rotas os inimigos vão seguir para chegar ate o player. Então tem o "problema do caixeiro viajante".
-<br> Então os inimigos podem percorrer uma rota mais longa ao invés de uma mais curta, pois implementei um sistema simples de escolha de rotas.
+
+**Update B.1.1.0.0**
+
+Atualizado o algoritmo de geração de caminho, agora as rotas geradas são boas o suficiente em comparação ao algoritmo original do jogo e em comparação com o algoritmo da tool do "Son of percia";
+<br> Mudei para o ".Net Framework 4.8", para compatibilidade com o Windows 7;
+<br> Os arquivos da versão anterior são compatíveis com a versão atual;
 
 ## RE4_RTP_EXTRACT.exe
 
@@ -43,7 +48,7 @@ Programa destinado a reempacotar o arquivo RTP, necessita de um arquivo .idxrtp 
 
 ## Problema do caixeiro viajante
 
-O arquivo .RTP é pode ser dividido em 3 blocos, e o terceiro bloco é o qual define os caminho entre dois nodes, atualmente é usado o primeiro caminho valido encontrado, e não o menor caminho possível, caso você tenha algoritmo para encontrar o menor caminho, que não seja na força bruto, favor entrar em contato.
+O arquivo .RTP é pode ser dividido em 3 blocos, e o terceiro bloco é o qual define os caminho entre dois nodes, na atualização "B.1.1.0.0", corrigi o problema dos caminhos, não é necessariamente o caminho mais curto, mas é bom o suficiente para não se notar diferença com o algoritmo que foi usado no jogo;
 
 
 ## Código de terceiro:
@@ -52,4 +57,4 @@ O arquivo .RTP é pode ser dividido em 3 blocos, e o terceiro bloco é o qual de
 Encontra-se no RE4_PMD_Repack, código modificado, as modificações podem ser vistas aqui: [link](https://github.com/JADERLINK/ObjLoader).
 
 **At.te: JADERLINK**
-<br>2023-10-12
+<br>2023-12-08

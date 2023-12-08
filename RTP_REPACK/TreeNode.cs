@@ -6,23 +6,20 @@ using System.Linq;
 
 namespace RTP_REPACK
 {
-    public class TreeNode : IEnumerable<TreeNode>
+    public class TreeNode
     {
 
         public ushort ID { get; private set; }
+        // os filhos, são todos os nodes para onde ele pode ir;
         public List<TreeNode> Children { get; set; }
-
-        public int Count { get { return Children.Count; } }
-
-        public TreeNode this[int i]
-        {
-            get { return Children[i]; }
-        }
+        // os pais, são todos os nodes de onde ele veio;
+        public List<TreeNode> Father { get; set; }
 
         public TreeNode(ushort ID)
         {
             this.ID = ID;
             this.Children = new List<TreeNode>();
+            this.Father = new List<TreeNode>();
         }
 
         public override string ToString()
@@ -30,17 +27,14 @@ namespace RTP_REPACK
             return ID.ToString();
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
+        public override bool Equals(object obj)
         {
-            return GetEnumerator();
+            return obj is TreeNode node && node.ID == ID;
         }
 
-        public IEnumerator<TreeNode> GetEnumerator()
+        public override int GetHashCode()
         {
-            foreach (var Child in Children)
-            {
-                yield return Child;
-            }
+            return (int)ID;
         }
 
     }
