@@ -7,6 +7,12 @@ Translate from Portuguese Brazil
 Programas destinados a extrair e reempacotar arquivo .RTP do RE4 de PS2, 2007, UHD.
 <br>Nota: esse é o arquivo que define quais rotas os inimigos vão seguir para chegar ate o player. Então tem o "problema do caixeiro viajante".
 
+**Update B.1.1.0.1**
+
+Adicionado compatibilidade com outros editores 3D que não suportam caracteres especiais #: como, por exemplo, o 3dsMax;
+<br> Adicionado também uma verificação no nome dos grupos, então caso esteja errado o nome, o programa avisa-rá;
+<br> Os arquivos da versão anterior são compatíveis com essa versão;
+
 **Update B.1.1.0.0**
 
 Atualizado o algoritmo de geração de caminho, agora as rotas geradas são boas o suficiente em comparação ao algoritmo original do jogo e em comparação com o algoritmo da tool do "Son of percia";
@@ -30,6 +36,7 @@ Veja o Exemplo:
 <br>![exemplo](exemplo.png)
 
 <br> O nome dos objetos tem que ser exatamente como é descrito abaixo:
+<br> Nota: o programa não diferencia minúsculas de maiúsculas.
 
 * **_RTP#Node_000#** onde 000 é um numero decimal que pode ir de 0 a 254, esse são os pontos onde o inimigos vai passar, a localização é definida pelo ponto de menor altura do triangulo.
 
@@ -40,6 +47,15 @@ Veja o Exemplo:
 *_Connection#001:False#002:True#_* cria uma conexão onde pode ir do node 2 para o 1, porem não pode fazer o caminho inverso.
 
 *_Connection#003:True#004:False#_* cria uma conexão onde pode ir do node 3 para o 4, porem não pode fazer o caminho inverso.
+
+<br> ----> No Update B.1.1.0.1, o nome dos objetos/grupos também pode ser:
+* **\_RTP\_Node\_000\_**
+* **Connection\_000\_True\_001\_True\_**
+
+<br> ----> Sobre verificações de grupos:
+<br> * No Repack se ao lado direito do nome do grupo aparecer o texto "The group name is wrong;", significa que o nome do grupo está errado, e o seu arquivo RTP vai ficar errado;
+<br> * E se ao lado direito aparecer "Warning: Group not used;" esse grupo esta sendo ignorado pelo meu programa, caso, na verdade, você gostaria de usá-lo, você deve arrumar o nome do grupo;
+
 
 ## RE4_RTP_REPACK.exe
 
@@ -54,7 +70,7 @@ O arquivo .RTP é pode ser dividido em 3 blocos, e o terceiro bloco é o qual de
 ## Código de terceiro:
 
 [ObjLoader by chrisjansson](https://github.com/chrisjansson/ObjLoader):
-Encontra-se no RE4_PMD_Repack, código modificado, as modificações podem ser vistas aqui: [link](https://github.com/JADERLINK/ObjLoader).
+Encontra-se no RE4_RTP_REPACK, código modificado, as modificações podem ser vistas aqui: [link](https://github.com/JADERLINK/ObjLoader).
 
 **At.te: JADERLINK**
-<br>2023-12-08
+<br>2023-12-09

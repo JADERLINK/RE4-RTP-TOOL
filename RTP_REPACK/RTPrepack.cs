@@ -11,6 +11,12 @@ namespace RTP_REPACK
     {
         public static void Repack(string rtpPath, string objPath, string txt2Path, bool IsPs2, bool createDebugFile) 
         {
+            string patternRTP = "^(_RTP#NODE_)([0]{0,})([0-9]{1,3})(#).*$";
+            System.Text.RegularExpressions.Regex regexRTP = new System.Text.RegularExpressions.Regex(patternRTP, System.Text.RegularExpressions.RegexOptions.CultureInvariant);
+            string patternCONNECTION = "^(CONNECTION#)(([0]{0,})([0-9]{1,3})(:)(TRUE|FALSE)(#)){2}.*$";
+            System.Text.RegularExpressions.Regex regexCONNECTION = new System.Text.RegularExpressions.Regex(patternCONNECTION, System.Text.RegularExpressions.RegexOptions.CultureInvariant);
+            //-----
+
             // load .obj file
             var objLoaderFactory = new ObjLoader.Loader.Loaders.ObjLoaderFactory();
             var objLoader = objLoaderFactory.Create();
@@ -33,7 +39,18 @@ namespace RTP_REPACK
 
                 if (groupName.StartsWith("_RTP"))
                 {
-                    Console.WriteLine("Loading in Obj: " + groupName);
+                    //FIX NAME
+                    groupName = groupName.Replace("_", "#").Replace("#RTP#NODE#", "_RTP#NODE_");
+
+                    //REGEX
+                    if (regexRTP.IsMatch(groupName))
+                    {
+                        Console.WriteLine("Loading in Obj: " + groupName);
+                    }
+                    else 
+                    {
+                        Console.WriteLine("Loading in Obj: " + groupName + "  The group name is wrong;");
+                    }
 
                     int id = -1;
 
@@ -88,7 +105,19 @@ namespace RTP_REPACK
                 }
                 else if (groupName.StartsWith("CONNECTION"))
                 {
-                    Console.WriteLine("Loading in Obj: " + groupName);
+
+                    //FIX NAME
+                    groupName = groupName.Replace("_", "#").Replace("#TRUE", ":TRUE").Replace("#FALSE", ":FALSE");
+
+                    //REGEX
+                    if (regexCONNECTION.IsMatch(groupName))
+                    {
+                        Console.WriteLine("Loading in Obj: " + groupName);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Loading in Obj: " + groupName + "  The group name is wrong;");
+                    }
 
                     var split1 = groupName.Split('#');
 
@@ -148,7 +177,7 @@ namespace RTP_REPACK
                         if (p1 > -1 && p2 > -1 && p1 < 255 && p2 < 255)
                         {
                             ConnectionKey key = new ConnectionKey((ushort)p1, (ushort)p2);
-                            ConnectionKey keyInv= new ConnectionKey((ushort)p2, (ushort)p1);
+                            ConnectionKey keyInv = new ConnectionKey((ushort)p2, (ushort)p1);
 
                             if (!ConnectionList.ContainsKey(key) && !ConnectionList.ContainsKey(keyInv)) // se ja tiver é porque esta duplicado
                             {
@@ -173,7 +202,10 @@ namespace RTP_REPACK
                     }
 
                 }
-
+                else 
+                {
+                    Console.WriteLine("Loading in Obj: " + groupName + "   Warning: Group not used;");
+                }
             }
 
             // adiciona os Points faltantes

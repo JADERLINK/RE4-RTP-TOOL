@@ -9,7 +9,7 @@ namespace RTP_REPACK
 {
     class Program
     {
-        public static string Version = "B.1.1.0.0 (2023-12-08)";
+        public static string Version = "B.1.1.0.1 (2023-12-09)";
 
         public static string headerText()
         {
