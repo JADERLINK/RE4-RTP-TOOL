@@ -6,7 +6,7 @@ Extract and repack RE4 RTP files (RE4 ubisoft/2007/steam/uhd/Ps2)
 Programas destinados a extrair e reempacotar arquivo .RTP do RE4 de PS2, 2007, UHD.
 <br>Nota: esse é o arquivo que define quais rotas os inimigos vão seguir para chegar até o player. Então tem o "problema do caixeiro viajante".
 
-**Update B.1.0.2**
+**Update B.1.1.2**
 <br>Nessa nova versão, para arquivos "0000.RTP", irá gerar arquivos .obj de nome "0000_RTP.obj", mudança feita para evitar sobreposição de arquivos.
 <br>Agora, o programa, ao gerar o arquivo .obj, não terá mais os zeros não significativos dos números, mudança feita para gerar arquivos menores.
 
@@ -30,12 +30,9 @@ Programa destinado a extrair o arquivo RTP, (escolha o .bat da mesma versão do 
 * .IDXRTP, esse arquivo é necessário para o repack, mas seu conteúdo não importa.
 * .TXT2, esse é um arquivo de debug, apenas informacional, por padrão não é gerado.
 
-
 **OBJ FILE**
-
-A escala do arquivo é 100 vezes menor que a do jogo, sendo Y a altura.
-
-Veja o Exemplo:
+<br>A escala do arquivo é 100 vezes menor que a do jogo, sendo Y a altura.
+<br>Veja o Exemplo:
 <br>![exemplo](exemplo.png)
 
 <br> O nome dos objetos tem que ser exatamente como é descrito abaixo:
@@ -66,7 +63,6 @@ Programa destinado a reempacotar o arquivo RTP, necessita de um arquivo .idxrtp 
 ## Problema do caixeiro viajante
 
 O arquivo .RTP é pode ser dividido em 3 blocos, e o terceiro bloco é o qual define os caminho entre dois nodes, na atualização "B.1.1.0.0", corrigi o problema dos caminhos, não é necessariamente o caminho mais curto, mas é bom o suficiente para não se notar diferença com o algoritmo que foi usado no jogo;
-
 
 ## Código de terceiro:
 
