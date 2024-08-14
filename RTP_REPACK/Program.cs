@@ -9,29 +9,33 @@ namespace RTP_REPACK
 {
     class Program
     {
-        public static string Version = "B.1.1.0.1 (2023-12-09)";
+        public static string Version = "B.1.1.2 (2024-08-13)";
 
         public static string headerText()
         {
             return "# RE4_RTP_REPACK" + Environment.NewLine +
                    "# by: JADERLINK" + Environment.NewLine +
+                   "# youtube.com/@JADERLINK" + Environment.NewLine +
                    "# Thanks to \"mariokart64n\" and \"zatarita\"" + Environment.NewLine +
                   $"# Version {Version}";
         }
 
         static void Main(string[] args)
         {
+            System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+
             Console.WriteLine(headerText());
 
             if (args.Length == 0)
             {
                 Console.WriteLine("For more information read:");
                 Console.WriteLine("https://github.com/JADERLINK/RE4-RTP-TOOL");
+                Console.WriteLine("Press any key to close the console.");
+                Console.ReadKey();
             }
             else if (args.Length >= 1 && File.Exists(args[0]))
             {
-                Console.WriteLine(args[0]);
-
+              
                 bool isPS2 = false;
 
                 bool createDebugFile = false;
@@ -48,12 +52,26 @@ namespace RTP_REPACK
 
                 FileInfo fileInfo = new FileInfo(args[0]);
 
+                Console.WriteLine(fileInfo.Name);
+
                 if (fileInfo.Extension.ToUpperInvariant() == ".IDXRTP")
                 {
-                    string baseName = fileInfo.FullName.Remove(fileInfo.FullName.Length - fileInfo.Extension.Length, fileInfo.Extension.Length);
-                    string objFile = baseName + ".obj";
-                    string rtpFile = baseName + ".RTP";
-                    string tx2File = baseName + ".Repack.txt2";
+                    string baseDirectory = Path.GetDirectoryName(fileInfo.FullName);
+                    string baseFileName = Path.GetFileNameWithoutExtension(fileInfo.FullName);
+
+                    string baseFilePath = Path.Combine(baseDirectory, baseFileName);
+
+                    string pattern = "^(00)([0-9]{2})$";
+                    System.Text.RegularExpressions.Regex regex = new System.Text.RegularExpressions.Regex(pattern, System.Text.RegularExpressions.RegexOptions.CultureInvariant);
+
+                    if (regex.IsMatch(baseFileName))
+                    {
+                        baseFilePath = Path.Combine(baseDirectory, baseFileName + "_RTP");
+                    }
+
+                    string objFile = baseFilePath + ".obj";
+                    string rtpFile = Path.Combine(baseDirectory, baseFileName + ".RTP");
+                    string tx2File = baseFilePath + ".Repack.txt2";
 
                     if (File.Exists(objFile))
                     {
@@ -68,24 +86,22 @@ namespace RTP_REPACK
                     }
                     else 
                     {
-
-                        Console.WriteLine("The .obj file does not exist");
+                        Console.WriteLine("The .obj file does not exist.");
                     }
 
                 }
                 else
                 {
-                    Console.WriteLine("Wrong file");
+                    Console.WriteLine("The extension is not valid: " + fileInfo.Extension);
                 }
 
             }
             else
             {
-                Console.WriteLine("The file does not exist");
+                Console.WriteLine("File specified does not exist.");
             }
 
-            Console.WriteLine("End");
-
+            Console.WriteLine("Finished!!!");
         }
     }
 }

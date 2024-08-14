@@ -9,25 +9,29 @@ namespace RTP_EXTRACT
 {
     class Program
     {
-        public static string Version = "B.1.1.0.0 (2023-12-08)";
+        public static string Version = "B.1.1.2 (2024-08-13)";
 
         public static string headerText()
         {
             return "# RE4_RTP_EXTRACT" + Environment.NewLine +
                    "# by: JADERLINK" + Environment.NewLine +
+                   "# youtube.com/@JADERLINK" + Environment.NewLine +
                    "# Thanks to \"mariokart64n\" and \"zatarita\"" + Environment.NewLine +
                   $"# Version {Version}";
         }
 
         static void Main(string[] args)
         {
-            Console.WriteLine(headerText());
+            System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 
+            Console.WriteLine(headerText());
 
             if (args.Length == 0)
             {
                 Console.WriteLine("For more information read:");
                 Console.WriteLine("https://github.com/JADERLINK/RE4-RTP-TOOL");
+                Console.WriteLine("Press any key to close the console.");
+                Console.ReadKey();
             }
             else if (args.Length >= 1 && File.Exists(args[0]))
             {
@@ -51,8 +55,8 @@ namespace RTP_EXTRACT
                 {
                     try
                     {
-                        Console.WriteLine(args[0]);
-                        RTPextract.extract(args[0], isPS2, createDebugFile);
+                        Console.WriteLine(fileInfo.Name);
+                        RTPextract.extract(fileInfo.FullName, isPS2, createDebugFile);
                     }
                     catch (Exception ex)
                     {
@@ -61,17 +65,16 @@ namespace RTP_EXTRACT
                 }
                 else
                 {
-                    Console.WriteLine("Wrong file");
+                    Console.WriteLine("The extension is not valid: " + fileInfo.Extension);
                 }
 
             }
             else
             {
-                Console.WriteLine("The file does not exist");
+                Console.WriteLine("File specified does not exist.");
             }
 
-
-            Console.WriteLine("End");
+            Console.WriteLine("Finished!!!");
         }
 
 

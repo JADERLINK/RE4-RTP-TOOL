@@ -88,7 +88,7 @@ namespace RTP_REPACK
 
         public override int GetHashCode()
         {
-            return Key1 * 0x100 * Key2;
+            return (int)((Key1 * 0x10000u) + Key2);
         }
     }
 

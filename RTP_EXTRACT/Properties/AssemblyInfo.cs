@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("RE4_RTP_EXTRACT")]
 [assembly: AssemblyDescription("RE4_RTP_EXTRACT")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("JADERLINK")]
 [assembly: AssemblyProduct("RE4_RTP_EXTRACT")]
-[assembly: AssemblyCopyright("Copyright © JADERLINK 2023")]
+[assembly: AssemblyCopyright("Copyright ©JADERLINK 2024")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

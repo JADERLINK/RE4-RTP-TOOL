@@ -10,21 +10,32 @@ namespace RTP_EXTRACT
     public class RTPextract
     {
     
-        public static void extract(string Filename, bool isPs2, bool createDebugFile)
+        public static void extract(string FileFullName, bool isPs2, bool createDebugFile)
         {
             var invariant = System.Globalization.CultureInfo.InvariantCulture;
 
-            FileInfo info = new FileInfo(Filename);
-            string baseName = info.FullName.Remove(info.FullName.Length - info.Extension.Length, info.Extension.Length);
+            FileInfo fileInfo = new FileInfo(FileFullName);
 
+            string baseDirectory = Path.GetDirectoryName(fileInfo.FullName);
+            string baseFileName = Path.GetFileNameWithoutExtension(fileInfo.FullName);
 
-            var txt = new AltTextWriter(baseName + ".txt2", createDebugFile);
+            string baseFilePath = Path.Combine(baseDirectory, baseFileName);
+
+            string pattern = "^(00)([0-9]{2})$";
+            System.Text.RegularExpressions.Regex regex = new System.Text.RegularExpressions.Regex(pattern, System.Text.RegularExpressions.RegexOptions.CultureInvariant);
+
+            if (regex.IsMatch(baseFileName))
+            {
+                baseFilePath = Path.Combine(baseDirectory, baseFileName + "_RTP");
+            }
+
+            var txt = new AltTextWriter(baseFilePath + ".txt2", createDebugFile);
             txt.WriteLine(Program.headerText());
             txt.WriteLine("");
             txt.WriteLine("Informational file only:");
-            txt.WriteLine(Filename);
+            txt.WriteLine(fileInfo.Name);
 
-            var idx = File.CreateText(baseName + ".idxrtp");
+            var idx = File.CreateText(Path.Combine(baseDirectory, baseFileName + ".idxrtp"));
             idx.WriteLine(Program.headerText());
             idx.WriteLine("# File required for repack;");
             idx.WriteLine("# There is nothing to be edited here;");
@@ -38,11 +49,11 @@ namespace RTP_EXTRACT
             idx.WriteLine("# Site: https://jaderlink.blogspot.com");
             idx.WriteLine("# Email: jaderlinkproject@gmail.com");
 
-            var obj = File.CreateText(baseName + ".obj");
+            var obj = File.CreateText(baseFilePath + ".obj");
             obj.WriteLine(Program.headerText());
             obj.WriteLine("");
 
-            var file = new FileStream(Filename, FileMode.Open);
+            var file = new FileStream(FileFullName, FileMode.Open);
 
 
             byte[] RTP_HEADER = new byte[6];
@@ -195,24 +206,24 @@ namespace RTP_EXTRACT
             obj.WriteLine("#vertices:");
             for (int i = 0; i < block1List.Length; i++)
             {
-                obj.WriteLine("v " + (block1List[i].X / 100f).ToString("f9", invariant)
-                   + " " + (block1List[i].Y / 100f).ToString("f9", invariant)
-                   + " " + (block1List[i].Z / 100f).ToString("f9", invariant));
+                obj.WriteLine("v " + (block1List[i].X / 100f).ToFloatString()
+                   + " " + (block1List[i].Y / 100f).ToFloatString()
+                   + " " + (block1List[i].Z / 100f).ToFloatString());
             }
 
             for (int i = 0; i < block1List.Length; i++)
             {
-                obj.WriteLine("v " + ((block1List[i].X - 500) / 100f).ToString("f9", invariant)
-                   + " " + ((block1List[i].Y + 1000) / 100f).ToString("f9", invariant)
-                   + " " + (block1List[i].Z / 100f).ToString("f9", invariant));
+                obj.WriteLine("v " + ((block1List[i].X - 500) / 100f).ToFloatString()
+                   + " " + ((block1List[i].Y + 1000) / 100f).ToFloatString()
+                   + " " + (block1List[i].Z / 100f).ToFloatString());
             }
 
 
             for (int i = 0; i < block1List.Length; i++)
             {
-                obj.WriteLine("v " + ((block1List[i].X + 500) / 100f).ToString("f9", invariant)
-                   + " " + ((block1List[i].Y + 1000) / 100f).ToString("f9", invariant)
-                   + " " + (block1List[i].Z / 100f).ToString("f9", invariant));
+                obj.WriteLine("v " + ((block1List[i].X + 500) / 100f).ToFloatString()
+                   + " " + ((block1List[i].Y + 1000) / 100f).ToFloatString()
+                   + " " + (block1List[i].Z / 100f).ToFloatString());
             }
 
             // points
