@@ -9,7 +9,7 @@ namespace RTP_REPACK
 {
     public static class FinalFile
     {
-        public static void FinalRTP(string pathRTP, ref FinalPoint[] Block1Array, ref Block2[] Block2Array, ref byte[][] block3Array, bool IsPs2) 
+        public static void FinalRTP(string pathRTP, ref FinalPoint[] Block1Array, ref Block2[] Block2Array, ref byte[][] block3Array, bool IsPs2, bool isPS4NS) 
         {
             BinaryWriter RTP = new BinaryWriter(new FileInfo(pathRTP).Create());
 
@@ -30,7 +30,13 @@ namespace RTP_REPACK
 
                 block2offset = block1offset + (block1Count * 32);
             }
-            else 
+            else if (isPS4NS)
+            {
+                block1offset = 0x28;
+
+                block2offset = block1offset + (block1Count * 16);
+            }
+            else //UHD
             {
                 block1offset = 0x18;
 
@@ -43,9 +49,22 @@ namespace RTP_REPACK
             RTP.Write(block1Count);
             RTP.Write(block2Count);
             RTP.Write(block3Count);
-            RTP.Write(block1offset);
-            RTP.Write(block2offset);
-            RTP.Write(block3offset);
+
+            if (isPS4NS)
+            {
+                RTP.Write((uint)0);
+
+                RTP.Write((long)block1offset);
+                RTP.Write((long)block2offset);
+                RTP.Write((long)block3offset);
+            }
+            else //UHD e PS2
+            {
+                RTP.Write(block1offset);
+                RTP.Write(block2offset);
+                RTP.Write(block3offset);
+            }
+       
 
             RTP.BaseStream.Position = block1offset;
 
@@ -131,15 +150,17 @@ namespace RTP_REPACK
             txt.WriteLine("Informational file only:");
             txt.WriteLine();
             txt.WriteLine();
+            txt.WriteLine();
 
             ushort block1Count = (ushort)Block1Array.Length;
             ushort block2Count = (ushort)Block2Array.Length;
             ushort block3Count = (ushort)(Block1Array.Length * Block1Array.Length);
 
-            txt.WriteLine("block1_Amount: " + block1Count);
-            txt.WriteLine("block2_Amount: " + block2Count);
-            txt.WriteLine("block3_Amount: " + block3Count);
+            txt.WriteLine("block1_Amount:" + block1Count);
+            txt.WriteLine("block2_Amount:" + block2Count);
+            txt.WriteLine("block3_Amount:" + block3Count);
 
+            txt.WriteLine();
             txt.WriteLine();
             txt.WriteLine();
             txt.WriteLine();

@@ -9,8 +9,8 @@ namespace RTP_EXTRACT
 {
     public class RTPextract
     {
-    
-        public static void extract(string FileFullName, bool isPs2, bool createDebugFile)
+
+        public static void extract(string FileFullName, bool isPs2, bool isPS4NS, bool createDebugFile)
         {
             var invariant = System.Globalization.CultureInfo.InvariantCulture;
 
@@ -29,18 +29,24 @@ namespace RTP_EXTRACT
                 baseFilePath = Path.Combine(baseDirectory, baseFileName + "_RTP");
             }
 
-            var txt = new AltTextWriter(baseFilePath + ".txt2", createDebugFile);
-            txt.WriteLine(Program.headerText());
-            txt.WriteLine("");
-            txt.WriteLine("Informational file only:");
-            txt.WriteLine(fileInfo.Name);
+            //------------------------------------------
+
+            var br = new BinaryReader(new FileStream(FileFullName, FileMode.Open));
+
+            uint RTP_MAGIC = br.ReadUInt32();
+            ushort RTP_Unk2 = br.ReadUInt16();
+
+            if (RTP_MAGIC != 0x32525450)
+            {
+                Console.WriteLine("Invalid RTP file.");
+                return;
+            }
 
             var idx = File.CreateText(Path.Combine(baseDirectory, baseFileName + ".idxrtp"));
             idx.WriteLine(Program.headerText());
             idx.WriteLine("# File required for repack;");
             idx.WriteLine("# There is nothing to be edited here;");
             idx.WriteLine("# Edit the .obj file;");
-
             idx.WriteLine("");
             idx.WriteLine("");
             idx.WriteLine("# JADERLINK: https://residentevilmodding.boards.net/user/10432");
@@ -48,58 +54,68 @@ namespace RTP_EXTRACT
             idx.WriteLine("# Youtube: https://www.youtube.com/@JADERLINK");
             idx.WriteLine("# Site: https://jaderlink.blogspot.com");
             idx.WriteLine("# Email: jaderlinkproject@gmail.com");
+            idx.Close();
 
-            var obj = File.CreateText(baseFilePath + ".obj");
-            obj.WriteLine(Program.headerText());
-            obj.WriteLine("");
+            var txt = new AltTextWriter(baseFilePath + ".txt2", createDebugFile);
+            txt.WriteLine(Program.headerText());
+            txt.WriteLine("");
+            txt.WriteLine("Informational file only:");
+            txt.WriteLine(fileInfo.Name);
 
-            var file = new FileStream(FileFullName, FileMode.Open);
-
-
-            byte[] RTP_HEADER = new byte[6];
-            file.Read(RTP_HEADER, 0, 6);
-            txt.WriteLine("RTP_HEADER:" + BitConverter.ToString(RTP_HEADER).Replace("-", ""));
+            txt.WriteLine("RTP_MAGIC: 0x" + RTP_MAGIC.ToString("X8"));
+            txt.WriteLine("RTP_Unk2: 0x" + RTP_Unk2.ToString("X4"));
 
             //---------------
 
-            byte[] block1Amount = new byte[2];
-            file.Read(block1Amount, 0, 2);
-            ushort ublock1Amount = BitConverter.ToUInt16(block1Amount, 0);
+            ushort ublock1Amount = br.ReadUInt16();
+            ushort ublock2Amount = br.ReadUInt16();
+            ushort ublock3Amount = br.ReadUInt16();
+
             txt.WriteLine("block1_Amount:" + ublock1Amount);
-
-            byte[] block2Amount = new byte[2];
-            file.Read(block2Amount, 0, 2);
-            ushort ublock2Amount = BitConverter.ToUInt16(block2Amount, 0);
             txt.WriteLine("block2_Amount:" + ublock2Amount);
-
-            byte[] block3Amount = new byte[2];
-            file.Read(block3Amount, 0, 2);
-            ushort ublock3Amount = BitConverter.ToUInt16(block3Amount, 0);
             txt.WriteLine("block3_Amount:" + ublock3Amount);
 
             //-------------
 
-            byte[] block1Offset = new byte[4];
-            file.Read(block1Offset, 0, 4);
-            uint ublock1Offset = BitConverter.ToUInt32(block1Offset, 0);
-            txt.WriteLine("block1_Offset:" + ublock1Offset);
+            long ublock1Offset = 0;
+            long ublock2Offset = 0;
+            long ublock3Offset = 0;
 
-            byte[] block2Offset = new byte[4];
-            file.Read(block2Offset, 0, 4);
-            uint ublock2Offset = BitConverter.ToUInt32(block2Offset, 0);
-            txt.WriteLine("block2_Offset:" + ublock2Offset);
+            if (isPS4NS)
+            {
+                uint pad = br.ReadUInt32();
+                txt.WriteLine("pad:" + pad.ToString("X8"));
 
-            byte[] block3Offset = new byte[4];
-            file.Read(block3Offset, 0, 4);
-            uint ublock3Offset = BitConverter.ToUInt32(block3Offset, 0);
-            txt.WriteLine("block3_Offset:" + ublock3Offset);
+                //offset de 64 bits
+                ublock1Offset = br.ReadInt64();
+                ublock2Offset = br.ReadInt64();
+                ublock3Offset = br.ReadInt64();
+
+                txt.WriteLine("block1_Offset:" + ublock1Offset.ToString("X16"));
+                txt.WriteLine("block2_Offset:" + ublock2Offset.ToString("X16"));
+                txt.WriteLine("block3_Offset:" + ublock3Offset.ToString("X16"));
+            }
+            else 
+            {
+                txt.WriteLine("");
+
+                //offset de 32 bytes
+                ublock1Offset = br.ReadUInt32();
+                ublock2Offset = br.ReadUInt32();
+                ublock3Offset = br.ReadUInt32();
+
+                txt.WriteLine("block1_Offset:" + ublock1Offset.ToString("X8"));
+                txt.WriteLine("block2_Offset:" + ublock2Offset.ToString("X8"));
+                txt.WriteLine("block3_Offset:" + ublock3Offset.ToString("X8"));
+
+            }
 
             //-----------
 
             txt.WriteLine("");
             txt.WriteLine("block1: (NodeTable)");
 
-            file.Position = ublock1Offset;
+            br.BaseStream.Position = ublock1Offset;
 
             Block1[] block1List = new Block1[ublock1Amount];
 
@@ -107,7 +123,7 @@ namespace RTP_EXTRACT
             {
                 //16
                 byte[] line = new byte[16];
-                file.Read(line, 0, 16);
+                br.BaseStream.Read(line, 0, 16);
 
                 float X = BitConverter.ToSingle(line, 0x0);
                 float Y = BitConverter.ToSingle(line, 0x4);
@@ -121,7 +137,7 @@ namespace RTP_EXTRACT
                     float W = BitConverter.ToSingle(line, 0xC); // sempre 1.0f
 
                     byte[] line2 = new byte[16];
-                    file.Read(line2, 0, 16);
+                    br.BaseStream.Read(line2, 0, 16);
 
                     connectionTableIndex = BitConverter.ToUInt16(line2, 0x0);
                     connectionCount = BitConverter.ToUInt16(line2, 0x2);
@@ -151,7 +167,7 @@ namespace RTP_EXTRACT
             txt.WriteLine("");
             txt.WriteLine("block2: (ConnectionTable)");
 
-            file.Position = ublock2Offset;
+            br.BaseStream.Position = ublock2Offset;
 
             Block2[] block2List = new Block2[ublock2Amount];
 
@@ -159,7 +175,7 @@ namespace RTP_EXTRACT
             {
                 // 4
                 byte[] line = new byte[4];
-                file.Read(line, 0, 4);
+                br.BaseStream.Read(line, 0, 4);
                 ushort connectionIndex = BitConverter.ToUInt16(line, 0);
                 ushort distance = BitConverter.ToUInt16(line, 2);
 
@@ -174,7 +190,7 @@ namespace RTP_EXTRACT
             txt.WriteLine("");
             txt.WriteLine("block3: (Traveling salesman problem table)");
 
-            file.Position = ublock3Offset;
+            br.BaseStream.Position = ublock3Offset;
 
             byte[][] block3 = new byte[ublock1Amount][];
 
@@ -189,11 +205,13 @@ namespace RTP_EXTRACT
             for (int i = 0; i < ublock1Amount; i++)
             {
                 byte[] block3line = new byte[ublock1Amount];
-                file.Read(block3line, 0, ublock1Amount);
-                txt.WriteLine($"block3[{i.ToString("X4")}]: " + BitConverter.ToString(block3line));
+                br.BaseStream.Read(block3line, 0, ublock1Amount);
+                txt.WriteLine($"block3[{i:X4}]: " + BitConverter.ToString(block3line));
 
                 block3[i] = block3line;
             }
+
+            br.Close();
 
             txt.WriteLine("");
             txt.WriteLine("All possible routes:");
@@ -201,8 +219,12 @@ namespace RTP_EXTRACT
 
             txt.WriteLine("");
             txt.WriteLine("End file");
+            txt.Close();
 
             // obj
+            var obj = File.CreateText(baseFilePath + ".obj");
+            obj.WriteLine(Program.headerText());
+            obj.WriteLine("");
             obj.WriteLine("#vertices:");
             for (int i = 0; i < block1List.Length; i++)
             {
@@ -298,10 +320,6 @@ namespace RTP_EXTRACT
 
             }
 
-
-            idx.Close();
-            file.Close();
-            txt.Close();
             obj.Close();
         }
 

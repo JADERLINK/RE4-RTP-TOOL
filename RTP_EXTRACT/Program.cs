@@ -9,7 +9,7 @@ namespace RTP_EXTRACT
 {
     class Program
     {
-        public static string Version = "B.1.1.2 (2024-08-13)";
+        public static string Version = "B.1.2.0 (2024-08-25)";
 
         public static string headerText()
         {
@@ -33,45 +33,84 @@ namespace RTP_EXTRACT
                 Console.WriteLine("Press any key to close the console.");
                 Console.ReadKey();
             }
-            else if (args.Length >= 1 && File.Exists(args[0]))
+            else if (args.Length >= 2)
             {
-                bool isPS2 = false;
-
-                bool createDebugFile = false;
-
-                if (args.Length >= 2 && args[1].ToUpper().Contains("TRUE"))
+                if (File.Exists(args[0]))
                 {
-                    isPS2 = true;
-                }
+                    bool isUHD = false;
+                    bool isPS2 = false;
+                    bool isPS4NS = false;
 
-                if (args.Length >= 3 && args[2].ToUpper().Contains("TRUE"))
-                {
-                    createDebugFile = true;
-                }
-
-                FileInfo fileInfo = new FileInfo(args[0]);
-
-                if (fileInfo.Extension.ToUpperInvariant() == ".RTP")
-                {
-                    try
+                    string arg = args[1].ToUpper();
+                    if (arg.Contains("UHD"))
                     {
-                        Console.WriteLine(fileInfo.Name);
-                        RTPextract.extract(fileInfo.FullName, isPS2, createDebugFile);
+                        isUHD = true;
                     }
-                    catch (Exception ex)
+                    else if (arg.Contains("2007PS2") || arg.Contains("PS2") || arg.Contains("2007"))
                     {
-                        Console.WriteLine("Error: " + ex);
+                        isPS2 = true;
+                    }
+                    else if (arg.Contains("PS4NS") || arg.Contains("PS4") || arg.Contains("NS"))
+                    {
+                        isPS4NS = true;
+                    }
+
+                    if (isUHD || isPS2 || isPS4NS)
+                    {
+                        bool createDebugFile = false;
+                        if (args.Length >= 3 && args[2].ToUpper().Contains("TRUE"))
+                        {
+                            createDebugFile = true;
+                        }
+
+                        FileInfo fileInfo = null;
+
+                        try
+                        {
+                            fileInfo = new FileInfo(args[0]);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("Error in the path: " + Environment.NewLine + ex);
+                        }
+
+                        if (fileInfo != null)
+                        {
+                            Console.WriteLine(fileInfo.Name);
+
+                            if (fileInfo.Extension.ToUpperInvariant() == ".RTP")
+                            {
+                                try
+                                {
+                                    RTPextract.extract(fileInfo.FullName, isPS2, isPS4NS, createDebugFile);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine("Error: " + ex);
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("The extension is not valid: " + fileInfo.Extension);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("The second argument is invalid.");
                     }
                 }
-                else
+                else 
                 {
-                    Console.WriteLine("The extension is not valid: " + fileInfo.Extension);
+                    Console.WriteLine("File specified does not exist.");
                 }
 
             }
             else
             {
-                Console.WriteLine("File specified does not exist.");
+                Console.WriteLine("The second argument is required.");
+                Console.WriteLine("Press any key to close the console.");
+                Console.ReadKey();
             }
 
             Console.WriteLine("Finished!!!");
