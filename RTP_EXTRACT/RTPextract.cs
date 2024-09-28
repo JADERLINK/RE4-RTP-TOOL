@@ -38,6 +38,7 @@ namespace RTP_EXTRACT
 
             if (RTP_MAGIC != 0x32525450)
             {
+                br.Close();
                 Console.WriteLine("Invalid RTP file.");
                 return;
             }
@@ -52,7 +53,7 @@ namespace RTP_EXTRACT
             idx.WriteLine("# JADERLINK: https://residentevilmodding.boards.net/user/10432");
             idx.WriteLine("# GitHub: https://github.com/JADERLINK");
             idx.WriteLine("# Youtube: https://www.youtube.com/@JADERLINK");
-            idx.WriteLine("# Site: https://jaderlink.blogspot.com");
+            idx.WriteLine("# Blog: https://jaderlink.blogspot.com");
             idx.WriteLine("# Email: jaderlinkproject@gmail.com");
             idx.Close();
 

@@ -9,7 +9,7 @@ namespace RTP_EXTRACT
 {
     class Program
     {
-        public static string Version = "B.1.2.0 (2024-08-25)";
+        public static string Version = "B.1.2.1 (2024-09-28)";
 
         public static string headerText()
         {

@@ -55,7 +55,7 @@ Programa destinado a extrair o arquivo RTP, (escolha o .bat da mesma versão do 
 
  ----> Sobre verificações de grupos:
 <br> * No Repack se ao lado direito do nome do grupo aparecer o texto "The group name is wrong;", significa que o nome do grupo está errado, e o seu arquivo RTP vai ficar errado;
-<br> * E se ao lado direito aparecer "Warning: Group not used;" esse grupo esta sendo ignorado pelo meu programa, caso, na verdade, você gostaria de usá-lo, você deve arrumar o nome do grupo;
+<br> * E se ao lado direito aparecer "Warning: Group not used;" esse grupo está sendo ignorado pelo meu programa, caso, na verdade, você gostaria de usá-lo, você deve arrumar o nome do grupo;
 
 
 ## RE4_RTP_REPACK.exe
@@ -74,4 +74,4 @@ Encontra-se no RE4_RTP_REPACK, código modificado, as modificações podem ser v
 
 **At.te: JADERLINK**
 <br>Thanks to "mariokart64n" and "zatarita"
-<br>2024-08-25
+<br>2024-09-28
