@@ -4,17 +4,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using SimpleEndianBinaryIO;
 
 namespace RTP_REPACK
 {
     public static class FinalFile
     {
-        public static void FinalRTP(string pathRTP, ref FinalPoint[] Block1Array, ref Block2[] Block2Array, ref byte[][] block3Array, bool IsPs2, bool isPS4NS) 
+        public static void FinalRTP(string pathRTP, ref FinalPoint[] Block1Array, ref Block2[] Block2Array, ref byte[][] block3Array, bool IsPs2, bool isPS4NS, bool isBig) 
         {
-            BinaryWriter RTP = new BinaryWriter(new FileInfo(pathRTP).Create());
+            Endianness endianness = Endianness.LittleEndian;
+            if (isBig)
+            {
+                endianness = Endianness.BigEndian;
+            }
 
-            byte[] header = new byte[6] { 0x50, 0x54, 0x52, 0x32, 0x00, 0x00 };
-            RTP.Write(header);
+            EndianBinaryWriter RTP = new EndianBinaryWriter(new FileInfo(pathRTP).Create(), endianness);
+
+            RTP.Write((uint)0x32525450);
+            RTP.Write((ushort)0x0000);
 
             ushort block1Count = (ushort)Block1Array.Length;
             ushort block2Count = (ushort)Block2Array.Length;
@@ -36,7 +43,7 @@ namespace RTP_REPACK
 
                 block2offset = block1offset + (block1Count * 16);
             }
-            else //UHD
+            else //UHD or big
             {
                 block1offset = 0x18;
 
@@ -58,7 +65,7 @@ namespace RTP_REPACK
                 RTP.Write((long)block2offset);
                 RTP.Write((long)block3offset);
             }
-            else //UHD e PS2
+            else //UHD ou PS2 ou Big
             {
                 RTP.Write(block1offset);
                 RTP.Write(block2offset);
@@ -68,11 +75,11 @@ namespace RTP_REPACK
 
             RTP.BaseStream.Position = block1offset;
 
-            RTP.Write(makeBlock1(ref Block1Array, IsPs2));
+            RTP.Write(MakeBlock1(ref Block1Array, IsPs2, endianness));
 
             RTP.BaseStream.Position = block2offset;
 
-            RTP.Write(makeBlock2(ref Block2Array));
+            RTP.Write(MakeBlock2(ref Block2Array, endianness));
 
             RTP.BaseStream.Position = block3offset;
 
@@ -91,19 +98,18 @@ namespace RTP_REPACK
             RTP.Close();
         }
 
-        private static byte[] makeBlock1(ref FinalPoint[] Block1Array, bool IsPs2) 
+        private static byte[] MakeBlock1(ref FinalPoint[] Block1Array, bool IsPs2, Endianness endianness) 
         {
             List<byte> b = new List<byte>();
 
             for (int i = 0; i < Block1Array.Length; i++)
             {
-                byte[] x = BitConverter.GetBytes((float)Block1Array[i].X);
-                byte[] y = BitConverter.GetBytes((float)Block1Array[i].Y);
-                byte[] z = BitConverter.GetBytes((float)Block1Array[i].Z);
-                byte[] w = BitConverter.GetBytes((float)1.0f);
+                byte[] x = EndianBitConverter.GetBytes((float)Block1Array[i].X, endianness);
+                byte[] y = EndianBitConverter.GetBytes((float)Block1Array[i].Y, endianness);
+                byte[] z = EndianBitConverter.GetBytes((float)Block1Array[i].Z, endianness);
 
-                byte[] index = BitConverter.GetBytes((ushort)Block1Array[i].ConnectionTableIndex);
-                byte[] count = BitConverter.GetBytes((ushort)Block1Array[i].ConnectionCount);
+                byte[] index = EndianBitConverter.GetBytes((ushort)Block1Array[i].ConnectionTableIndex, endianness);
+                byte[] count = EndianBitConverter.GetBytes((ushort)Block1Array[i].ConnectionCount, endianness);
 
                 b.AddRange(x);
                 b.AddRange(y);
@@ -111,6 +117,7 @@ namespace RTP_REPACK
 
                 if (IsPs2)
                 {
+                    byte[] w = BitConverter.GetBytes((float)1.0f);
                     b.AddRange(w);
                 }
 
@@ -126,14 +133,14 @@ namespace RTP_REPACK
             return b.ToArray();
         }
 
-        private static byte[] makeBlock2(ref Block2[] Block2Array) 
+        private static byte[] MakeBlock2(ref Block2[] Block2Array, Endianness endianness) 
         {
             List<byte> b = new List<byte>();
 
             for (int i = 0; i < Block2Array.Length; i++)
             {
-                b.AddRange(BitConverter.GetBytes((ushort)Block2Array[i].ConnectionIndex));
-                b.AddRange(BitConverter.GetBytes((ushort)Block2Array[i].Distance));
+                b.AddRange(EndianBitConverter.GetBytes((ushort)Block2Array[i].ConnectionIndex, endianness));
+                b.AddRange(EndianBitConverter.GetBytes((ushort)Block2Array[i].Distance, endianness));
             }
 
             return b.ToArray();
@@ -226,7 +233,7 @@ namespace RTP_REPACK
                         byte value = block3[row][column];
 
                         StringBuilder sb = new StringBuilder(30);
-                        recursive(ref sb, ref pointsOnThePath, ref block3, row, column, value);
+                        Recursive(ref sb, ref pointsOnThePath, ref block3, row, column, value);
                         txt.Write(sb.ToString());
                     }
                     else if (block3[row][column] == row)
@@ -244,14 +251,14 @@ namespace RTP_REPACK
 
         }
 
-        private static void recursive(ref StringBuilder sb, ref HashSet<byte> pointsOnThePath, ref byte[][] block3, int row, int column, byte value)
+        private static void Recursive(ref StringBuilder sb, ref HashSet<byte> pointsOnThePath, ref byte[][] block3, int row, int column, byte value)
         {
             pointsOnThePath.Add(value);
             sb.Append(" " + value.ToString("X2"));
             byte nextPoint = block3[value][column];
             if (value != column && !pointsOnThePath.Contains(nextPoint))
             {
-                recursive(ref sb, ref pointsOnThePath, ref block3, row, column, nextPoint);
+                Recursive(ref sb, ref pointsOnThePath, ref block3, row, column, nextPoint);
             }
             else if (value != column && pointsOnThePath.Contains(nextPoint))
             {

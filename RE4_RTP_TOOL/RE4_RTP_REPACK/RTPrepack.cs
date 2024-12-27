@@ -9,7 +9,7 @@ namespace RTP_REPACK
 {
     public static class RTPrepack
     {
-        public static void Repack(string rtpPath, string objPath, string txt2Path, bool IsPs2, bool isPS4NS, bool createDebugFile) 
+        public static void Repack(string rtpPath, string objPath, string txt2Path, bool IsPs2, bool isPS4NS, bool isBig, bool createDebugFile) 
         {
             string patternRTP = "^(_RTP#NODE_)([0]{0,})([0-9]{1,3})(#).*$";
             System.Text.RegularExpressions.Regex regexRTP = new System.Text.RegularExpressions.Regex(patternRTP, System.Text.RegularExpressions.RegexOptions.CultureInvariant);
@@ -288,7 +288,7 @@ namespace RTP_REPACK
             finalStruture.Fill(ref PointList, ref Block2List);
 
 
-            FinalFile.FinalRTP(rtpPath, ref finalStruture.Block1Array, ref finalStruture.Block2Array, ref block3Array, IsPs2, isPS4NS);
+            FinalFile.FinalRTP(rtpPath, ref finalStruture.Block1Array, ref finalStruture.Block2Array, ref block3Array, IsPs2, isPS4NS, isBig);
 
 
             if (createDebugFile)

@@ -5,15 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 
-namespace RTP_EXTRACT
+namespace RTP_REPACK
 {
     class Program
     {
-        public static string Version = "B.1.2.1 (2024-09-28)";
+        public static string Version = "B.1.3.0 (2024-12-27)";
 
         public static string headerText()
         {
-            return "# RE4_RTP_EXTRACT" + Environment.NewLine +
+            return "# RE4_RTP_REPACK" + Environment.NewLine +
                    "# by: JADERLINK" + Environment.NewLine +
                    "# youtube.com/@JADERLINK" + Environment.NewLine +
                    "# Thanks to \"mariokart64n\" and \"zatarita\"" + Environment.NewLine +
@@ -23,6 +23,7 @@ namespace RTP_EXTRACT
         static void Main(string[] args)
         {
             System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+            Console.OutputEncoding = Encoding.UTF8;
 
             Console.WriteLine(headerText());
 
@@ -40,6 +41,7 @@ namespace RTP_EXTRACT
                     bool isUHD = false;
                     bool isPS2 = false;
                     bool isPS4NS = false;
+                    bool isBig = false;
 
                     string arg = args[1].ToUpper();
                     if (arg.Contains("UHD"))
@@ -54,8 +56,12 @@ namespace RTP_EXTRACT
                     {
                         isPS4NS = true;
                     }
+                    else if (arg.Contains("BIG"))
+                    {
+                        isBig = true;
+                    }
 
-                    if (isUHD || isPS2 || isPS4NS)
+                    if (isUHD || isPS2 || isPS4NS || isBig)
                     {
                         bool createDebugFile = false;
                         if (args.Length >= 3 && args[2].ToUpper().Contains("TRUE"))
@@ -74,37 +80,65 @@ namespace RTP_EXTRACT
                             Console.WriteLine("Error in the path: " + Environment.NewLine + ex);
                         }
 
-                        if (fileInfo != null)
+                        if (fileInfo != null) 
                         {
                             Console.WriteLine(fileInfo.Name);
 
-                            if (fileInfo.Extension.ToUpperInvariant() == ".RTP")
+                            if (fileInfo.Extension.ToUpperInvariant() == ".IDXRTP")
                             {
-                                try
+                                string baseDirectory = Path.GetDirectoryName(fileInfo.FullName);
+                                string baseFileName = Path.GetFileNameWithoutExtension(fileInfo.FullName);
+
+                                string baseFilePath = Path.Combine(baseDirectory, baseFileName);
+
+                                string pattern = "^(00)([0-9]{2})$";
+                                System.Text.RegularExpressions.Regex regex = new System.Text.RegularExpressions.Regex(pattern, System.Text.RegularExpressions.RegexOptions.CultureInvariant);
+
+                                if (regex.IsMatch(baseFileName))
                                 {
-                                    RTPextract.extract(fileInfo.FullName, isPS2, isPS4NS, createDebugFile);
+                                    baseFilePath = Path.Combine(baseDirectory, baseFileName + "_RTP");
                                 }
-                                catch (Exception ex)
+
+                                string objFile = baseFilePath + ".obj";
+                                string rtpFile = Path.Combine(baseDirectory, baseFileName + ".RTP");
+                                string tx2File = baseFilePath + ".Repack.txt2";
+
+                                if (File.Exists(objFile))
                                 {
-                                    Console.WriteLine("Error: " + ex);
+                                    try
+                                    {
+                                        RTPrepack.Repack(rtpFile, objFile, tx2File, isPS2, isPS4NS, isBig, createDebugFile);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Console.WriteLine("Error: " + ex);
+                                    }
                                 }
+                                else
+                                {
+                                    Console.WriteLine("The .obj file does not exist.");
+                                }
+
                             }
                             else
                             {
                                 Console.WriteLine("The extension is not valid: " + fileInfo.Extension);
                             }
                         }
+
                     }
                     else
                     {
                         Console.WriteLine("The second argument is invalid.");
                     }
+
                 }
-                else 
+                else
                 {
                     Console.WriteLine("File specified does not exist.");
                 }
 
+                Console.WriteLine("Finished!!!");
             }
             else
             {
@@ -112,14 +146,7 @@ namespace RTP_EXTRACT
                 Console.WriteLine("Press any key to close the console.");
                 Console.ReadKey();
             }
-
-            Console.WriteLine("Finished!!!");
+         
         }
-
-
     }
-
-
- 
-
 }

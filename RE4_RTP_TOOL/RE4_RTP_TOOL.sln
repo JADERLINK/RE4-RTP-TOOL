@@ -1,0 +1,42 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.33130.400
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RE4_RTP_EXTRACT", "RE4_RTP_EXTRACT\RE4_RTP_EXTRACT.csproj", "{33072D73-8366-4FB8-8DCE-1D6D6004EA7B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RE4_RTP_REPACK", "RE4_RTP_REPACK\RE4_RTP_REPACK.csproj", "{8C87AF68-FB1A-46C1-92DA-0C185DA419EE}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "CjClutter.ObjLoader.Loader", "CjClutter.ObjLoader.Loader\CjClutter.ObjLoader.Loader.shproj", "{8A3A7579-5EF1-448E-A7E3-2BF569F56ED4}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SimpleEndianBinaryIO", "SimpleEndianBinaryIO\SimpleEndianBinaryIO.shproj", "{5DDB0D8F-D1EA-479F-8FAC-BE2B5C6BAB65}"
+EndProject
+Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		SimpleEndianBinaryIO\SimpleEndianBinaryIO.projitems*{33072d73-8366-4fb8-8dce-1d6d6004ea7b}*SharedItemsImports = 4
+		SimpleEndianBinaryIO\SimpleEndianBinaryIO.projitems*{5ddb0d8f-d1ea-479f-8fac-be2b5c6bab65}*SharedItemsImports = 13
+		CjClutter.ObjLoader.Loader\CjClutter.ObjLoader.Loader.projitems*{8a3a7579-5ef1-448e-a7e3-2bf569f56ed4}*SharedItemsImports = 13
+		CjClutter.ObjLoader.Loader\CjClutter.ObjLoader.Loader.projitems*{8c87af68-fb1a-46c1-92da-0c185da419ee}*SharedItemsImports = 4
+		SimpleEndianBinaryIO\SimpleEndianBinaryIO.projitems*{8c87af68-fb1a-46c1-92da-0c185da419ee}*SharedItemsImports = 4
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{33072D73-8366-4FB8-8DCE-1D6D6004EA7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33072D73-8366-4FB8-8DCE-1D6D6004EA7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33072D73-8366-4FB8-8DCE-1D6D6004EA7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33072D73-8366-4FB8-8DCE-1D6D6004EA7B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C87AF68-FB1A-46C1-92DA-0C185DA419EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C87AF68-FB1A-46C1-92DA-0C185DA419EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C87AF68-FB1A-46C1-92DA-0C185DA419EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C87AF68-FB1A-46C1-92DA-0C185DA419EE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {81C970BF-FF5A-48D6-9681-8E14FD191928}
+	EndGlobalSection
+EndGlobal

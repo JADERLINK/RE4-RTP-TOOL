@@ -4,13 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using SimpleEndianBinaryIO;
 
 namespace RTP_EXTRACT
 {
     public class RTPextract
     {
 
-        public static void extract(string FileFullName, bool isPs2, bool isPS4NS, bool createDebugFile)
+        public static void Extract(string FileFullName, bool isPs2, bool isPS4NS, bool isBig, bool createDebugFile)
         {
             var invariant = System.Globalization.CultureInfo.InvariantCulture;
 
@@ -30,8 +31,13 @@ namespace RTP_EXTRACT
             }
 
             //------------------------------------------
+            Endianness endianness = Endianness.LittleEndian;
+            if (isBig)
+            {
+                endianness = Endianness.BigEndian;
+            }
 
-            var br = new BinaryReader(new FileStream(FileFullName, FileMode.Open));
+            var br = new EndianBinaryReader(new FileStream(FileFullName, FileMode.Open), endianness);
 
             uint RTP_MAGIC = br.ReadUInt32();
             ushort RTP_Unk2 = br.ReadUInt16();
@@ -126,16 +132,16 @@ namespace RTP_EXTRACT
                 byte[] line = new byte[16];
                 br.BaseStream.Read(line, 0, 16);
 
-                float X = BitConverter.ToSingle(line, 0x0);
-                float Y = BitConverter.ToSingle(line, 0x4);
-                float Z = BitConverter.ToSingle(line, 0x8);
+                float X = EndianBitConverter.ToSingle(line, 0x0, endianness);
+                float Y = EndianBitConverter.ToSingle(line, 0x4, endianness);
+                float Z = EndianBitConverter.ToSingle(line, 0x8, endianness);
 
                 ushort connectionTableIndex;
                 ushort connectionCount;
 
                 if (isPs2)
                 {
-                    float W = BitConverter.ToSingle(line, 0xC); // sempre 1.0f
+                    //float W = BitConverter.ToSingle(line, 0xC); // sempre 1.0f
 
                     byte[] line2 = new byte[16];
                     br.BaseStream.Read(line2, 0, 16);
@@ -147,8 +153,8 @@ namespace RTP_EXTRACT
                 }
                 else 
                 {
-                    connectionTableIndex = BitConverter.ToUInt16(line, 0xC);
-                    connectionCount = BitConverter.ToUInt16(line, 0xE);
+                    connectionTableIndex = EndianBitConverter.ToUInt16(line, 0xC, endianness);
+                    connectionCount = EndianBitConverter.ToUInt16(line, 0xE, endianness);
                 }
 
                 txt.WriteLine("block1[" + i.ToString("X4") + "];  X:" + X.ToString("f6", invariant).PadLeft(16) + "  Y: " + 
@@ -177,8 +183,8 @@ namespace RTP_EXTRACT
                 // 4
                 byte[] line = new byte[4];
                 br.BaseStream.Read(line, 0, 4);
-                ushort connectionIndex = BitConverter.ToUInt16(line, 0);
-                ushort distance = BitConverter.ToUInt16(line, 2);
+                ushort connectionIndex = EndianBitConverter.ToUInt16(line, 0, endianness);
+                ushort distance = EndianBitConverter.ToUInt16(line, 2, endianness);
 
                 txt.WriteLine("block2[" + i.ToString("X4") + "]; connectionIndex: " + connectionIndex.ToString("X4") + "  distance: " + distance.ToString("X4"));
 
@@ -340,7 +346,7 @@ namespace RTP_EXTRACT
                         byte value = block3[row][column];
                         
                         StringBuilder sb = new StringBuilder(30);
-                        recursive(ref sb, ref pointsOnThePath, ref block3, row, column, value);
+                        Recursive(ref sb, ref pointsOnThePath, ref block3, row, column, value);
                         txt.Write(sb.ToString());
                     }
                     else if (block3[row][column] == row)
@@ -358,14 +364,14 @@ namespace RTP_EXTRACT
    
         }
 
-        private static void recursive(ref StringBuilder sb, ref HashSet<byte> pointsOnThePath, ref byte[][] block3, int row, int column, byte value) 
+        private static void Recursive(ref StringBuilder sb, ref HashSet<byte> pointsOnThePath, ref byte[][] block3, int row, int column, byte value) 
         {
             pointsOnThePath.Add(value);
             sb.Append(" " + value.ToString("X2"));
             byte nextPoint = block3[value][column];
             if (value != column && !pointsOnThePath.Contains(nextPoint))
             {
-                recursive(ref sb, ref pointsOnThePath, ref block3, row, column, nextPoint);
+                Recursive(ref sb, ref pointsOnThePath, ref block3, row, column, nextPoint);
             }
             else if (value != column && pointsOnThePath.Contains(nextPoint))
             {

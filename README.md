@@ -1,10 +1,13 @@
 # RE4-RTP-TOOL
-Extract and repack RE4 RTP files (RE4 2007/PS2/UHD/PS4/NS)
+Extract and repack RE4 RTP files (RE4 2007/PS2/UHD/PS4/NS/GC/WII/XBOX360)
 
 **Translate from Portuguese Brazil**
 
-Programas destinados a extrair e reempacotar arquivo .RTP do RE4 de PS2, 2007, UHD, PS4 e NS.
+Programas destinados a extrair e reempacotar arquivo .RTP do RE4.
 <br>Nota: esse é o arquivo que define quais rotas os inimigos vão seguir para chegar até o player. Então tem o "problema do caixeiro viajante".
+
+**Update B.1.3.0**
+<br>Adicionado suporte para as versões GC/WII/XBOX360;
 
 **Update B.1.2.0**
 <br>Adicionado suporte para as versões de PS4 e NS;
@@ -16,7 +19,7 @@ Programas destinados a extrair e reempacotar arquivo .RTP do RE4 de PS2, 2007, U
 **Update B.1.1.0.1**
 
 Adicionado compatibilidade com outros editores 3D que não suportam caracteres especiais #: como, por exemplo, o 3dsMax;
-<br> Adicionado também uma verificação no nome dos grupos, então caso esteja errado o nome, o programa avisa-rá;
+<br> Adicionado também uma verificação no nome dos grupos, então caso esteja errado o nome, o programa avisará;
 <br> Os arquivos da versão anterior são compatíveis com essa versão;
 
 **Update B.1.1.0.0**
@@ -35,21 +38,21 @@ Programa destinado a extrair o arquivo RTP, (escolha o .bat da mesma versão do 
 
 **OBJ FILE**
 <br>A escala do arquivo é 100 vezes menor que a do jogo, sendo Y a altura.
-<br>Veja o Exemplo:
+<br>Veja o exemplo:
 <br>![exemplo](exemplo.png)
 
 <br> O nome dos objetos tem que ser exatamente como é descrito abaixo:
 <br> Nota: o programa não diferencia minúsculas de maiúsculas.
 
-* **_RTP#Node_000#** onde 000 é um número decimal que pode ir de 0 a 254, esses são os pontos onde os inimigos vai passar, a localização é definida pelo ponto de menor altura do triangulo.
+* **_RTP#Node_000#** onde 000 é um número decimal que pode ir de 0 a 254, esses são os pontos onde os inimigos vão passar, a localização é definida pelo ponto de menor altura do triangulo.
 
-* **Connection#000:True#001:True#** são linhas, a localização da linha não é importante para o repack, é apenas para referencia, o importante é o nome do objeto, no qual faz a ligação entre dois pontos: seguindo a definição abaixo:
+* **Connection#000:True#001:True#** são linhas, a localização da linha não é importante para o repack, é apenas para referência, o importante é o nome do objeto, no qual faz a ligação entre dois pontos: seguindo a definição abaixo:
 
 *_Connection#000:True#001:True#_* vai ter uma conexão entre o node 0 e o node 1, sendo que pode ir do node 0 para 1 , e do node 1 para o 0
 <br>*_Connection#001:False#002:True#_* cria uma conexão onde pode ir do node 2 para o 1, porem não pode fazer o caminho inverso.
-<br>*_Connection#003:True#004:False#_* cria uma conexão onde pode ir do node 3 para o 4, porem não pode fazer o caminho inverso.
+<br>*_Connection#003:True#004:False#_* cria uma conexão onde pode ir do node 3 para o 4, porém não pode fazer o caminho inverso.
 
- ----> No Update B.1.1.0.1, o nome dos objetos/grupos também pode ser:
+ ----> No Update B.1.1.0.1, o nome dos objetos/grupos também pode ser:
 * **\_RTP\_Node\_000\_**
 * **Connection\_000\_True\_001\_True\_**
 
@@ -65,13 +68,13 @@ Programa destinado a reempacotar o arquivo RTP, necessita de um arquivo .idxrtp 
 
 ## Problema do caixeiro viajante
 
-O arquivo .RTP pode ser dividido em 3 blocos, e o terceiro bloco é o qual define os caminho entre dois nodes, na atualização "B.1.1.0.0", corrigi o problema dos caminhos, não é necessariamente o caminho mais curto, mas é bom o suficiente para não se notar diferença com o algoritmo que foi usado no jogo;
+O arquivo .RTP pode ser dividido em 3 blocos, e o terceiro bloco é o qual define os caminhos entre dois nodes, na atualização "B.1.1.0.0", corrigi o problema dos caminhos, não é necessariamente o caminho mais curto, mas é bom o suficiente para não se notar diferença com o algoritmo que foi usado no jogo;
 
 ## Código de terceiro:
 
 [ObjLoader by chrisjansson](https://github.com/chrisjansson/ObjLoader):
-Encontra-se no RE4_RTP_REPACK, código modificado, as modificações podem ser vistas aqui: [link](https://github.com/JADERLINK/ObjLoader).
+Encontra-se em RE4_RTP_TOOL/CjClutter.ObjLoader.Loader, código modificado, as modificações podem ser vistas aqui: [link](https://github.com/JADERLINK/ObjLoader).
 
 **At.te: JADERLINK**
 <br>Thanks to "mariokart64n" and "zatarita"
-<br>2024-09-28
+<br>2024-12-27
